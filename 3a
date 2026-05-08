@@ -1,0 +1,77 @@
+lex.l
+
+%{
+#include "y.tab.h"
+%}
+
+%%
+"for"        { return FOR; }
+[a-zA-Z]+    { return ID; }
+[0-9]+       { return NUM; }
+
+"="          { return '='; }
+"<"          { return '<'; }
+"++"         { return INC; }
+
+";"          { return ';'; }
+"("          { return '('; }
+")"          { return ')'; }
+
+[ \t\n]      ;   /* ignore whitespace */
+
+.            { return yytext[0]; }
+%%
+
+parser.y
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+
+void yyerror(const char *s);
+int yylex();
+%}
+
+%token FOR ID NUM INC
+
+%%
+
+S:
+    L1 { printf("Valid Nested FOR Loop (>=3 levels)\n"); }
+    ;
+
+L1:
+    FOR '(' E ';' E ';' E ')' L2
+    ;
+
+L2:
+    FOR '(' E ';' E ';' E ')' L3
+    ;
+
+L3:
+    FOR '(' E ';' E ';' E ')' BODY
+    ;
+
+BODY:
+    ';'
+    ;
+
+E:
+    ID '=' NUM
+  | ID '<' NUM
+  | ID INC
+  ;
+
+%%
+
+void yyerror(const char *s)
+{
+    printf("Invalid FOR Loop Structure\n");
+}
+
+int main()
+{
+    printf("Enter nested FOR loop:\n");
+    yyparse();
+    return 0;
+}

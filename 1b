@@ -1,0 +1,52 @@
+lexer.l
+
+%{
+#include "y.tab.h"
+%}
+
+%%
+a   { return A; }
+b   { return B; }
+c   { return C; }
+\n  { return 0; }
+.   { return yytext[0]; }
+%%
+
+parser.y
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+
+void yyerror(const char *s);
+int yylex();
+%}
+
+%token A B C
+
+%%
+
+S : X Y   { printf("Valid String\n"); }
+  ;
+
+X : A X B
+  | 
+  ;
+
+Y : B Y C
+  | 
+  ;
+
+%%
+
+void yyerror(const char *s)
+{
+    printf("Invalid String\n");
+}
+
+int main()
+{
+    printf("Enter string:\n");
+    yyparse();
+    return 0;
+}

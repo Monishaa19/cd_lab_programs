@@ -1,0 +1,81 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+
+int isKeyword(char buffer[]) {
+    char keywords[][10] = {"if", "else", "while", "int", "return"};
+    int n = 5;
+
+    for(int i = 0; i < n; i++) {
+        if(strcmp(buffer, keywords[i]) == 0)
+            return 1;
+    }
+    return 0;
+}
+
+int main() {
+    char ch, buffer[50];
+    char operators[] = "+-*/%=<>";
+    char specialSymbols[] = ";,(){}";
+    FILE *fp;
+    int i, j = 0;
+
+    fp = fopen("program.txt", "r");
+
+    if(fp == NULL) {
+        printf("Error opening file\n");
+        return 0;
+    }
+
+    while((ch = fgetc(fp)) != EOF) {
+
+        // Check operator
+        for(i = 0; i < 8; i++) {
+            if(ch == operators[i]) {
+                printf("%c is operator\n", ch);
+                break;
+            }
+        }
+
+        // Check special symbols
+        for(i = 0; i < 6; i++) {
+            if(ch == specialSymbols[i]) {
+                printf("%c is special symbol\n", ch);
+                break;
+            }
+        }
+
+        // Build token
+        if(isalnum(ch)) {
+            buffer[j++] = ch;
+        }
+        else if((ch == ' ' || ch == '\n' || ch == '\t') && j != 0) {
+            buffer[j] = '\0';
+
+            if(isKeyword(buffer))
+                printf("%s is keyword\n", buffer);
+            else if(isdigit(buffer[0]))
+                printf("%s is constant\n", buffer);
+            else
+                printf("%s is identifier\n", buffer);
+
+            j = 0;
+        }
+    }
+
+    // Handle last token if file doesn't end with space
+    if(j != 0) {
+        buffer[j] = '\0';
+
+        if(isKeyword(buffer))
+            printf("%s is keyword\n", buffer);
+        else if(isdigit(buffer[0]))
+            printf("%s is constant\n", buffer);
+        else
+            printf("%s is identifier\n", buffer);
+    }
+
+    fclose(fp);
+    return 0;
+}

@@ -19,6 +19,10 @@
 .       { return yytext[0]; }
 %%
 
+int yywrap(){
+    return 1;
+}
+
 %{
 #include <stdio.h>
 #include <stdlib.h>
